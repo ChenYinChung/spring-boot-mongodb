@@ -1,0 +1,52 @@
+buildscript {
+    dependencies {
+//        classpath files("${rootDir}/lib/mysql-connector-java-5.1.46.jar")
+    }
+
+}
+
+ext {
+    SpringBbootStarterVersion= "2.0.2.RELEASE"
+}
+
+apply from: file("${rootDir}/gradle/project.gradle")
+
+subprojects {
+    group 'com.test'
+    version '1.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+//configure(subprojects.findAll {it.name.endsWith('-db-migration') }) {
+//    apply from: file("${rootDir}/gradle/db-migration.gradle")
+//}
+
+
+configure(subprojects.findAll { it.name.equals('mongodb-service') }) {
+    apply from: file("${rootDir}/gradle/app.gradle")
+
+}
+
+
+project(':mongodb-service'){
+    dependencies {
+        configurations {
+            // remove default logger
+            all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+            // remove tomcat , replace with undertow
+            all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        }
+
+        compile "org.springframework.boot:spring-boot-starter-web:${SpringBbootStarterVersion}"
+        compile "org.springframework.boot:spring-boot-starter-aop:${SpringBbootStarterVersion}"
+        compile "org.springframework.boot:spring-boot-starter-undertow:${SpringBbootStarterVersion}"
+        compile "org.springframework.boot:spring-boot-starter-log4j2:${SpringBbootStarterVersion}"
+        compile "org.springframework.boot:spring-boot-starter-data-mongodb:${SpringBbootStarterVersion}"
+        compile "com.google.code.gson:gson:2.8.4"
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    }
+}

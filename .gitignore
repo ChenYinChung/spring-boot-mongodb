@@ -1,0 +1,14 @@
+/.idea
+
+*.iml
+/mongo/build
+/mongo/docker-compose/mongo
+/mongo/docker-compose/mongoconfig
+build
+/mongo/.gradle
+/.gradle
+
+.idea/
+/build/
+/classes/
+out
