@@ -1,10 +1,12 @@
 package com.sb.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: sammy
@@ -20,22 +22,33 @@ public class Order implements Serializable {
     /**
      * ssc, 11x5 ...
      */
+    @Indexed
     private String game;
 
     /**
      * cqssc, cq11x5 ...
      */
+    @Indexed
     private String kind;
 
-    private String customer_id;
+    private String customerId;
+
+    private String orderNum;
+
+    public String getOrderNum() {
+        return orderNum;
+    }
+
+    public void setOrderNum(String orderNum) {
+        this.orderNum = orderNum;
+    }
 
     /**
      * 期號
      */
-    private long numero_start;
 
-    private long numero_end;
-
+    @Indexed
+    private String numero;
 
     /**
      *
@@ -52,14 +65,50 @@ public class Order implements Serializable {
      */
     private boolean aborting;
 
-    private List<String> selected;
+    private List<String> line0;
+    private List<String> line1;
+    private List<String> line2;
+    private List<String> line3;
+    private List<String> line4;
 
-    public List<String> getSelected() {
-        return selected;
+    public List<String> getLine1() {
+        return line1;
     }
 
-    public void setSelected(List<String> selected) {
-        this.selected = selected;
+    public void setLine1(List<String> line1) {
+        this.line1 = line1;
+    }
+
+    public List<String> getLine2() {
+        return line2;
+    }
+
+    public void setLine2(List<String> line2) {
+        this.line2 = line2;
+    }
+
+    public List<String> getLine3() {
+        return line3;
+    }
+
+    public void setLine3(List<String> line3) {
+        this.line3 = line3;
+    }
+
+    public List<String> getLine4() {
+        return line4;
+    }
+
+    public void setLine4(List<String> line4) {
+        this.line4 = line4;
+    }
+
+    public List<String> getLine0() {
+        return line0;
+    }
+
+    public void setLine0(List<String> line0) {
+        this.line0 = line0;
     }
 
     public String getId() {
@@ -86,28 +135,12 @@ public class Order implements Serializable {
         this.kind = kind;
     }
 
-    public String getCustomer_id() {
-        return customer_id;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomer_id(String customer_id) {
-        this.customer_id = customer_id;
-    }
-
-    public long getNumero_start() {
-        return numero_start;
-    }
-
-    public void setNumero_start(long numero_start) {
-        this.numero_start = numero_start;
-    }
-
-    public long getNumero_end() {
-        return numero_end;
-    }
-
-    public void setNumero_end(long numero_end) {
-        this.numero_end = numero_end;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public String getBetting_slip() {
@@ -134,5 +167,11 @@ public class Order implements Serializable {
         this.aborting = aborting;
     }
 
+    public String getNumero() {
+        return numero;
+    }
 
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
 }

@@ -1,6 +1,6 @@
 package com.sb.config;
 
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,22 @@ public class MongoConfig {
 
     @Bean
     public MongoDbFactory mongoDbFactory() throws Exception {
-        return new SimpleMongoDbFactory(new MongoClient(host,port), database);
+
+
+        ServerAddress serverAddress= new ServerAddress(host,port);
+
+        MongoClientOptions options = MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY)
+                .connectTimeout(30000)
+                .connectionsPerHost(128)
+                .heartbeatConnectTimeout(15000)
+                .heartbeatFrequency(10000)
+                .maxConnectionIdleTime(60000)
+                .maxWaitTime(10000).build();
+        MongoClient mongoClient = new MongoClient(serverAddress,options);
+
+
+
+        return new SimpleMongoDbFactory(mongoClient, database);
     }
 
     @Bean
