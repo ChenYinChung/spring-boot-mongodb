@@ -69,7 +69,7 @@ public class OrderMain {
 
     private static Order selectLine0() {
 
-        List<String> line0 = selected(2);
+        List<String> line0 = selected(5);
         List<String> line1 = selected(0);
         List<String> line2 = selected(0);
         List<String> line3 = selected(0);
@@ -97,8 +97,8 @@ public class OrderMain {
 
     private static Order selectLine01() {
 
-        List<String> line0 = selected(2);
-        List<String> line1 = selected(3);
+        List<String> line0 = selected(5);
+        List<String> line1 = selected(6);
         List<String> line2 = selected(0);
         List<String> line3 = selected(0);
         List<String> line4 = selected(0);
@@ -124,9 +124,9 @@ public class OrderMain {
 
     private static Order selectLine02() {
 
-        List<String> line0 = selected(2);
-        List<String> line1 = selected(3);
-        List<String> line2 = selected(4);
+        List<String> line0 = selected(5);
+        List<String> line1 = selected(6);
+        List<String> line2 = selected(7);
         List<String> line3 = selected(0);
         List<String> line4 = selected(0);
 
@@ -152,10 +152,10 @@ public class OrderMain {
 
     private static Order selectLine03() {
 
-        List<String> line0 = selected(2);
-        List<String> line1 = selected(3);
-        List<String> line2 = selected(4);
-        List<String> line3 = selected(3);
+        List<String> line0 = selected(5);
+        List<String> line1 = selected(6);
+        List<String> line2 = selected(7);
+        List<String> line3 = selected(6);
         List<String> line4 = selected(0);
 
 
@@ -180,11 +180,11 @@ public class OrderMain {
 
     private static Order selectLine04() {
 
-        List<String> line0 = selected(2);
-        List<String> line1 = selected(3);
-        List<String> line2 = selected(4);
-        List<String> line3 = selected(3);
-        List<String> line4 = selected(2);
+        List<String> line0 = selected(6);
+        List<String> line1 = selected(7);
+        List<String> line2 = selected(8);
+        List<String> line3 = selected(7);
+        List<String> line4 = selected(6);
 
 
         Order order = new Order();
@@ -240,6 +240,8 @@ public class OrderMain {
             }
 
         }
+
+        Collections.sort(data);
 
         return data;
     }
