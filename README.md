@@ -1,3 +1,4 @@
+
 ##Purpose
  測試spring boot framework ,miro service 以RESTful為基礎, mongo db測試
  
@@ -19,6 +20,7 @@
 run in command mode , needs install gradle 4.7 version above 
 
 * insert test data test/java/com/sb/OrderMain.java
+  orders data create by schema(local) define in file spring.data.mongodb.database=local , document(order) define in Order.java
 
 * run WebApplication for startup application
   * start docker-compose up -d
