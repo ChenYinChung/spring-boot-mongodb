@@ -9,8 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.sb" })
-@PropertySource({"classpath:application.properties","classpath:mongodb.properties"})
-
+@PropertySource({"application.properties","mongodb.properties","undertow.properties"})
 @EnableCaching
 public class WebApplication {
 

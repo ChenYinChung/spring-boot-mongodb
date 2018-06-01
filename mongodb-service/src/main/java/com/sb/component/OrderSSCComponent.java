@@ -1,18 +1,17 @@
 package com.sb.component;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.sb.model.Order;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @Auther: sammy
@@ -22,116 +21,169 @@ import java.util.List;
 
 @Component
 public class OrderSSCComponent {
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     MongoTemplate mongoTemplate;
+
+    ExecutorService executorService = Executors.newFixedThreadPool(20);
 
     public void saveDemo(Order order) {
         mongoTemplate.save(order);
     }
 
+    public List<Order> findAllMatch(String game, String kind, String numero, List<String> lines) {
 
-    public List<Order> findAllMatch(String game, String kind,String numero,List<String> lines) {
-
-        Criteria gameCriteria = new Criteria("game");
-        gameCriteria.is(game);
-
-        Criteria kindCriteria = new Criteria("kind");
-        kindCriteria.is(kind);
-
-        Criteria numeroCriteria = new Criteria("numero");
-        numeroCriteria.is(numero);
-
-        List<Order> list = new ArrayList<>();
-
-        list.addAll(findMatchLine0(gameCriteria,kindCriteria,numeroCriteria,lines));
-        list.addAll(findMatchLine01(gameCriteria,kindCriteria,numeroCriteria,lines));
-        list.addAll(findMatchLine02(gameCriteria,kindCriteria,numeroCriteria,lines));
-        list.addAll(findMatchLine03(gameCriteria,kindCriteria,numeroCriteria,lines));
-        list.addAll(findMatchLine04(gameCriteria,kindCriteria,numeroCriteria,lines));
+        List<Future<List<Order>>> futures = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
 
 
-        return list;
+        Criteria gameCriteria = new Criteria("game").is(game);
+        Criteria kindCriteria = new Criteria("kind").is(kind);
+        Criteria numeroCriteria = new Criteria("numero").is(numero);
+
+
+        futures.add(findMatchLine0(gameCriteria, kindCriteria, numeroCriteria, lines)); // 符合一星
+        futures.add(findMatchLine01(gameCriteria, kindCriteria, numeroCriteria, lines));// 符合二星
+        futures.add(findMatchLine02(gameCriteria, kindCriteria, numeroCriteria, lines));// 符合三星
+        futures.add(findMatchLine03(gameCriteria, kindCriteria, numeroCriteria, lines));// 符合四星
+        futures.add(findMatchLine04(gameCriteria, kindCriteria, numeroCriteria, lines));// 符合五星
+
+
+        while(true){
+
+            for (Iterator<Future<List<Order>>> iterator = futures.iterator(); iterator.hasNext(); ) {
+                Future<List<Order>> future = iterator.next();
+                if(future.isDone()){
+                    try {
+                        orders.addAll(future.get());
+                    } catch (InterruptedException | ExecutionException e) {
+                        logger.error("future interrupted",e);
+                    }
+                    iterator.remove();
+                }
+            }
+
+            if(futures.size()==0){
+                break;
+            }
+        }
+
+        return orders;
     }
 
-    private List<Order>  findMatchLine0(Criteria game,Criteria kind,Criteria numero,List<String> lines){
-        Criteria oneMatch = new Criteria();
-        oneMatch.andOperator(Criteria.where("line0").in(lines.get(0)),Criteria.where("line1").size(0),
-                Criteria.where("line2").size(0),Criteria.where("line3").size(0),Criteria.where("line4").size(0));
+    private Future<List<Order>> findMatchLine0(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
+        Callable callable = () -> {
+            String line0 = lines.get(0);
+            Criteria oneMatch = new Criteria();
+            oneMatch.andOperator(Criteria.where("line0").in(line0), Criteria.where("line1").size(0),
+                    Criteria.where("line2").size(0), Criteria.where("line3").size(0), Criteria.where("line4").size(0));
 
-        Query query = new Query();
-        query.addCriteria(game);
-        query.addCriteria(kind);
-        query.addCriteria(numero);
-        query.addCriteria(oneMatch);
+            Query query = new Query();
+            query.addCriteria(game);
+            query.addCriteria(kind);
+            query.addCriteria(numero);
+            query.addCriteria(oneMatch);
 
-        List<Order> list = mongoTemplate.find(query, Order.class);
-        return list;
+            return mongoTemplate.find(query, Order.class);
+        };
 
-    }
-
-    private List<Order>  findMatchLine01(Criteria game,Criteria kind,Criteria numero,List<String> lines){
-        Criteria twoMatch = new Criteria();
-        twoMatch.andOperator(Criteria.where("line0").in(lines.get(0)),Criteria.where("line1").in(lines.get(1)),
-                Criteria.where("line2").size(0),Criteria.where("line3").size(0),Criteria.where("line4").size(0));
-
-
-        Query query = new Query();
-        query.addCriteria(game);
-        query.addCriteria(kind);
-        query.addCriteria(numero);
-        query.addCriteria(twoMatch);
-
-        List<Order> list = mongoTemplate.find(query, Order.class);
-        return list;
-
-    }
-
-    private List<Order> findMatchLine02(Criteria game,Criteria kind,Criteria numero,List<String> lines){
-        Criteria threeMatch = new Criteria();
-        threeMatch.andOperator(Criteria.where("line0").in(lines.get(0)),Criteria.where("line1").in(lines.get(1)),
-                Criteria.where("line2").in(lines.get(2)),Criteria.where("line3").size(0),Criteria.where("line4").size(0));
-
-        Query query = new Query();
-        query.addCriteria(game);
-        query.addCriteria(kind);
-        query.addCriteria(numero);
-        query.addCriteria(threeMatch);
-
-        List<Order> list = mongoTemplate.find(query, Order.class);
-        return list;
+        return executorService.submit(callable);
 
     }
 
-    private List<Order> findMatchLine03(Criteria game,Criteria kind,Criteria numero,List<String> lines){
-        Criteria fourMatch = new Criteria();
-        fourMatch.andOperator(Criteria.where("line0").in(lines.get(0)),Criteria.where("line1").in(lines.get(1)),
-                Criteria.where("line2").in(lines.get(2)),Criteria.where("line3").in(lines.get(3)),Criteria.where("line4").size(0));
 
-        Query query = new Query();
-        query.addCriteria(game);
-        query.addCriteria(kind);
-        query.addCriteria(numero);
-        query.addCriteria(fourMatch);
+    private Future<List<Order>> findMatchLine01(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
 
-        List<Order> list = mongoTemplate.find(query, Order.class);
-        return list;
+        Callable callable = () -> {
+            String line0 = lines.get(0);
+            String line1 = lines.get(1);
 
-    }
+            Criteria twoMatch = new Criteria();
+            twoMatch.andOperator(Criteria.where("line0").in(line0), Criteria.where("line1").in(line1),
+                    Criteria.where("line2").size(0), Criteria.where("line3").size(0), Criteria.where("line4").size(0));
 
-    private List<Order> findMatchLine04(Criteria game,Criteria kind,Criteria numero,List<String> lines){
-        Criteria fiveMatch = new Criteria();
-        fiveMatch.andOperator(Criteria.where("line0").in(lines.get(0)),Criteria.where("line1").in(lines.get(1)),
-                Criteria.where("line2").in(lines.get(2)),Criteria.where("line3").in(lines.get(3)),Criteria.where("line4").in(lines.get(4)));
 
-        Query query = new Query();
-        query.addCriteria(game);
-        query.addCriteria(kind);
-        query.addCriteria(numero);
-        query.addCriteria(fiveMatch);
+            Query query = new Query();
+            query.addCriteria(game);
+            query.addCriteria(kind);
+            query.addCriteria(numero);
+            query.addCriteria(twoMatch);
 
-        List<Order> list = mongoTemplate.find(query, Order.class);
-        return list;
+            return mongoTemplate.find(query, Order.class);
+        };
+
+
+        return executorService.submit(callable);
 
     }
 
+    private Future<List<Order>> findMatchLine02(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
+        Callable callable = () -> {
+            String line0 = lines.get(0);
+            String line1 = lines.get(1);
+            String line2 = lines.get(2);
+
+
+            Criteria threeMatch = new Criteria();
+            threeMatch.andOperator(Criteria.where("line0").in(line0), Criteria.where("line1").in(line1),
+                    Criteria.where("line2").in(line2), Criteria.where("line3").size(0), Criteria.where("line4").size(0));
+
+            Query query = new Query();
+            query.addCriteria(game);
+            query.addCriteria(kind);
+            query.addCriteria(numero);
+            query.addCriteria(threeMatch);
+            return mongoTemplate.find(query, Order.class);
+        };
+
+        return executorService.submit(callable);
+
+    }
+
+    private Future<List<Order>> findMatchLine03(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
+        Callable callable = () -> {
+            String line0 = lines.get(0);
+            String line1 = lines.get(1);
+            String line2 = lines.get(2);
+            String line3 = lines.get(3);
+
+            Criteria fourMatch = new Criteria();
+            fourMatch.andOperator(Criteria.where("line0").in(line0), Criteria.where("line1").in(line1),
+                    Criteria.where("line2").in(line2), Criteria.where("line3").in(line3), Criteria.where("line4").size(0));
+
+            Query query = new Query();
+            query.addCriteria(game);
+            query.addCriteria(kind);
+            query.addCriteria(numero);
+            query.addCriteria(fourMatch);
+
+            return mongoTemplate.find(query, Order.class);
+        };
+        return executorService.submit(callable);
+
+    }
+
+    private Future<List<Order>> findMatchLine04(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
+        Callable callable = () -> {
+            String line0 = lines.get(0);
+            String line1 = lines.get(1);
+            String line2 = lines.get(2);
+            String line3 = lines.get(3);
+            String line4 = lines.get(4);
+
+            Criteria fiveMatch = new Criteria();
+            fiveMatch.andOperator(Criteria.where("line0").in(line0), Criteria.where("line1").in(line1),
+                    Criteria.where("line2").in(line2), Criteria.where("line3").in(line3), Criteria.where("line4").in(line4));
+
+            Query query = new Query();
+            query.addCriteria(game);
+            query.addCriteria(kind);
+            query.addCriteria(numero);
+            query.addCriteria(fiveMatch);
+
+            return mongoTemplate.find(query, Order.class);
+        };
+        return executorService.submit(callable);
+    }
 }

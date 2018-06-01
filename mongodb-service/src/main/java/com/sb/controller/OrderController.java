@@ -26,21 +26,24 @@ public class OrderController {
     }
 
     /**
-     * http://localhost:8080/order/find/1/2/3/4/5
-     * @param i0
-     * @param i1
-     * @param i2
-     * @param i3
-     * @param i4
+     * http://localhost:8080/order/find/SSC/CQSSC/test-12345/1/2/3/4/5
+     * @param game
+     * @param kind
+     * @param numero
+     * @param line0
+     * @param line1
+     * @param line2
+     * @param line3
+     * @param line4
      * @return
      */
-    @RequestMapping(value = "/find/{game}/{kind}/{numero}/{i0}/{i1}/{i2}/{i3}/{i4}", method = {RequestMethod.GET})
+    @RequestMapping(value = "/find/{game}/{kind}/{numero}/{line0}/{line1}/{line2}/{line3}/{line4}", method = {RequestMethod.GET})
     public List<Order> find(@PathVariable("game") String game, @PathVariable("kind") String kind,
                             @PathVariable("numero") String numero,
-                            @PathVariable("i0") String i0, @PathVariable("i1") String i1,
-                            @PathVariable("i2") String i2,
-                            @PathVariable("i3") String i3, @PathVariable("i4") String i4) {
-        List<Order> list = orderService.find(game,kind,numero,i0,i1,i2,i3,i4);
+                            @PathVariable("line0") String line0, @PathVariable("line1") String line1,
+                            @PathVariable("line2") String line2,
+                            @PathVariable("line3") String line3, @PathVariable("line4") String line4) {
+        List<Order> list = orderService.find(game,kind,numero,line0,line1,line2,line3,line4);
         return list;
     }
 

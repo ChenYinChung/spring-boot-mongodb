@@ -34,14 +34,14 @@ public class OrderService {
     }
 
 
-    public List<Order> find(String game, String kind,String numero,String i0, String i1, String i2, String i3,String i4){
+    public List<Order> find(String game, String kind,String numero,String line0, String line1, String line2, String line3,String line4){
 
         List<String> selected = new ArrayList<>();
-        selected.add(i0);
-        selected.add(i1);
-        selected.add(i2);
-        selected.add(i3);
-        selected.add(i4);
+        selected.add(line0);
+        selected.add(line1);
+        selected.add(line2);
+        selected.add(line3);
+        selected.add(line4);
 
         List<Order> list = orderSSCComponent.findAllMatch(game,kind,numero,selected);
 
