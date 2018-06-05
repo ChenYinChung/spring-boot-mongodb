@@ -73,7 +73,7 @@ public class OrderSSCComponent {
     }
 
     private Future<List<Order>> findMatchLine0(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
-        Callable callable = () -> {
+        Callable<List<Order>> callable = () -> {
             String line0 = lines.get(0);
             Criteria oneMatch = new Criteria();
             oneMatch.andOperator(Criteria.where("line0").in(line0), Criteria.where("line1").size(0),
@@ -95,7 +95,7 @@ public class OrderSSCComponent {
 
     private Future<List<Order>> findMatchLine01(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
 
-        Callable callable = () -> {
+        Callable<List<Order>> callable = () -> {
             String line0 = lines.get(0);
             String line1 = lines.get(1);
 
@@ -119,7 +119,7 @@ public class OrderSSCComponent {
     }
 
     private Future<List<Order>> findMatchLine02(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
-        Callable callable = () -> {
+        Callable<List<Order>> callable = () -> {
             String line0 = lines.get(0);
             String line1 = lines.get(1);
             String line2 = lines.get(2);
@@ -142,7 +142,7 @@ public class OrderSSCComponent {
     }
 
     private Future<List<Order>> findMatchLine03(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
-        Callable callable = () -> {
+        Callable<List<Order>> callable = () -> {
             String line0 = lines.get(0);
             String line1 = lines.get(1);
             String line2 = lines.get(2);
@@ -165,7 +165,7 @@ public class OrderSSCComponent {
     }
 
     private Future<List<Order>> findMatchLine04(Criteria game, Criteria kind, Criteria numero, List<String> lines) {
-        Callable callable = () -> {
+        Callable<List<Order>> callable = () -> {
             String line0 = lines.get(0);
             String line1 = lines.get(1);
             String line2 = lines.get(2);
